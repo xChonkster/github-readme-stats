@@ -1,7 +1,12 @@
-const { request, logger } = require("../common/utils");
+// @ts-check
+const { request, logger, MissingParamError } = require("../common/utils");
 const retryer = require("../common/retryer");
 require("dotenv").config();
 
+/**
+ * @param {import('Axios').AxiosRequestHeaders} variables
+ * @param {string} token
+ */
 const fetcher = (variables, token) => {
   return request(
     {
@@ -35,8 +40,13 @@ const fetcher = (variables, token) => {
   );
 };
 
+/**
+ * @param {string} username
+ * @param {string[]} exclude_repo
+ * @returns {Promise<import("./types").TopLangData>}
+ */
 async function fetchTopLanguages(username, exclude_repo = []) {
-  if (!username) throw Error("Invalid username");
+  if (!username) throw new MissingParamError(["username"]);
 
   const res = await retryer(fetcher, { login: username });
 
